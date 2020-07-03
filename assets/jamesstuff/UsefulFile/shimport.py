@@ -18,11 +18,10 @@ def Add (items):
 
 def Divide (items):
     if (len(items) >= 2):
-        result = 0
-        for item in items:
+        result = float(items[0])
+        for item in range(len(items) - 1):
             try:
-                item = float(item)
-                result = result + item
+                result = result / float(items[item + 1])
             except:
                 __main__.InsertText("ERROR: '" + item + "' cannot be converted to a float")
                 return None
@@ -34,7 +33,7 @@ def Divide (items):
 
 def Multiply (items):
     if (len(items) >= 2):
-        result = 0
+        result = 1
         for item in items:
             try:
                 item = float(item)
@@ -50,11 +49,10 @@ def Multiply (items):
 
 def Subtract (items):
     if (len(items) >= 2):
-        result = 0
-        for item in items:
+        result = float(items[0])
+        for item in range(len(items) - 1):
             try:
-                item = float(item)
-                result = result - item
+                result = result - float(items[item + 1])
             except:
                 __main__.InsertText("ERROR: '" + item + "' cannot be converted to a float")
                 return None
