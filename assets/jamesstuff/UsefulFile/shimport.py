@@ -1,6 +1,6 @@
 import __main__
 
-def Add (items):
+def Add (items): #Adds all floats passed - Takes two or more parameters
     if (len(items) >= 2):
         result = 0
         for item in items:
@@ -16,7 +16,7 @@ def Add (items):
         __main__.InsertText("ERROR: The function 'Add' takes at least two items")
         return None
 
-def Divide (items):
+def Divide (items): #Divides the first item by the next, then the product of that by the next, and so on - Takes two or more parameters
     if (len(items) >= 2):
         result = float(items[0])
         for item in range(len(items) - 1):
@@ -31,7 +31,7 @@ def Divide (items):
         __main__.InsertText("ERROR: The function 'Divide' takes at least two items")
         return None
 
-def Multiply (items):
+def Multiply (items): #Multiplies all floats passed - Takes two or more parameters
     if (len(items) >= 2):
         result = 1
         for item in items:
@@ -47,7 +47,7 @@ def Multiply (items):
         __main__.InsertText("ERROR: The function 'Multiply' takes at least two items")
         return None
 
-def Subtract (items):
+def Subtract (items): #Subtracts the first item by the next, then the product of that by the next, and so on - Takes two or more parameters
     if (len(items) >= 2):
         result = float(items[0])
         for item in range(len(items) - 1):
@@ -62,7 +62,7 @@ def Subtract (items):
         __main__.InsertText("ERROR: The function 'Subtract' takes at least two items")
         return None
 
-functions = {
+functions = { #Lists the functions to be read by PyConsole
     "Add" : Add,
     "Divide" : Divide,
     "Multiply" : Multiply,
