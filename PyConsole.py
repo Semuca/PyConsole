@@ -12,7 +12,7 @@ root.minsize(200, 55)
 originPath = os.getcwd() + "/assets/" #Sets directory
 currentDir = ""
 
-editable = False #
+editable = False #Determines if the header of the entry can be changed. Used in ChangeHeader
 
 def Back (items): #Takes the directory one file back - Takes no parameters
     if (not items):
@@ -24,7 +24,7 @@ def Back (items): #Takes the directory one file back - Takes no parameters
                 break
             if (currentDir[i] == "/"):
                 firstPoint = i + 1
-        ChangeBackground("  >> " + currentDir)
+        ChangeHeader("  >> " + currentDir)
         Listfiles(None)
         return originPath + currentDir
     else:
@@ -38,7 +38,7 @@ def GoTo (items): #Goes to a specified folder in the current directory - Takes o
         if (os.path.isdir(originPath + currentDir + folder)):
             currentDir = currentDir + folder + "/" #Changes current directory to match
             InsertText("Navigated to: " + originPath + currentDir)
-            ChangeBackground("  >> " + currentDir)
+            ChangeHeader("  >> " + currentDir)
             Listfiles(None) #Automatically lists directory files
             return originPath + currentDir
         else:
@@ -162,12 +162,12 @@ def ImageConfigure(event): #Configures the image size based on window size from 
 
 def RunCommand(event):
     global prev
-    global background
+    global header
     global editable
     rawCommand = current.get() #Gets text from entry
     InsertText(rawCommand) #Inserts entry in console
-    console.delete(len(background), "end") #Clears entry
-    command = rawCommand[len(background):] #Removes the initial text from the command
+    console.delete(len(header), "end") #Clears entry
+    command = rawCommand[len(header):] #Removes the initial text from the command
     readValue = 0
     readFunction = 0
     bracketlevel = -1
@@ -222,19 +222,19 @@ def InsertText(newText): #Insert text into the console
         prev = text[i] + "\n" + prev
     prevCommands.config(text = prev)
 
-def ChangeBackground(newBackground): #Change the header of the entry
-    global background
+def ChangeHeader(newHeader): #Change the header of the entry
+    global header
     global editable
-    background = newBackground
-    editable = True #Toggle the editable variable to allow the background to be changed
+    header = newHeader
+    editable = True #Toggle the editable variable to allow the header to be changed
     console.delete(0, END)
-    console.insert(0, background)
+    console.insert(0, header)
     editable = False
 
 def CheckStr(text): #Every time the entry is edited, check to see if the header has been edited
-    global background
+    global header
     global editable
-    if (text[:len(background)] == background or editable == True):
+    if (text[:len(header)] == header or editable == True):
         return True
     else:
         return False
@@ -243,7 +243,7 @@ text = []
 
 prev = "" #Setup string variables and CheckStr function
 curentDir = ""
-background = "  >> "
+header = "  >> "
 current = StringVar()
 validatecmd = root.register(CheckStr)
 
