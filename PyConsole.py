@@ -1,3 +1,4 @@
+import math
 import os
 import sys
 from tkinter import *
@@ -14,6 +15,24 @@ currentDir = ""
 
 editable = False #Determines if the header of the entry can be changed. Used in ChangeHeader
 
+class Error: #Error class so for functions to return when an error occurs
+    errorMessage = ""
+    
+    def __init__(self, _errorMessage):
+        self.errorMessage = _errorMessage
+
+def ThrowInvalidValueError(value): #Error for an invalid value being passed
+    return Error("InvalidValueError: '" + value + "' is not a valid value")
+
+def ThrowParametersError(function, paramNum1, paramNum2): #Error an invalid number of parameters being passed
+    if (paramNum2 == None):
+        if (paramNum1 != 1):
+            return Error("ParametersError: Function '" + function + "' takes " + str(paramNum1) + " parameters")
+        else:
+            return Error("ParametersError: Function '" + function + "' takes 1 parameter")
+    else:
+        return Error("ParametersError: Function '" + function + "' takes " + str(paramNum1) + "-" + str(paramNum2) + " parameters")
+
 def Back (items): #Takes the directory one file back - Takes no parameters
     if (not items):
         global currentDir
@@ -26,51 +45,45 @@ def Back (items): #Takes the directory one file back - Takes no parameters
                 firstPoint = i + 1
         ChangeHeader("  >> " + currentDir)
         Listfiles(None)
-        return originPath + currentDir
-    else:
-        InsertText("ERROR: This function 'Back' does not take items")
         return None
+    else:
+        return ThrowParametersError("Back", 0, None)
 
 def GoTo (items): #Goes to a specified folder in the current directory - Takes one parameter
     if (len(items) == 1):
         global currentDir
-        folder = items[0]
-        if (os.path.isdir(originPath + currentDir + folder)):
-            currentDir = currentDir + folder + "/" #Changes current directory to match
+        if (os.path.isdir(originPath + currentDir + items[0])):
+            currentDir = currentDir + items[0] + "/" #Changes current directory to match
             InsertText("Navigated to: " + originPath + currentDir)
             ChangeHeader("  >> " + currentDir)
             Listfiles(None) #Automatically lists directory files
-            return originPath + currentDir
-        else:
-            InsertText("ERROR: '" + folder + "' is not a valid file")
             return None
+        else:
+            return ThrowInvalidValueError(items[0])
     else:
-        InsertText("ERROR: The function 'GoTo' takes one item")
-        return None
+        return ThrowParametersError("GoTo", 1, None)
 
 def Help (items): #Lists all known functions - Takes no parameters or one parameter
-    if (len(items) < 2):
+    functionsList = sorted(functions.keys())
+    if (len(items) <= math.ceil(len(functionsList) / 10)):
         try:
             if (not items): #Sets index for the page based off parameter - If no parameter is mentioned, page 1 is assumed
                 index = 0
             else:
                 index = (int(items[0]) - 1) * 10
-            functionsList = sorted(functions.keys())
             if (index <= len(functionsList) and index >= 0): #Tests if index is range
                 for i in range(10):
                     try:
                         InsertText(functionsList[index + i])
                     except:
                         pass
-            else:
-                InsertText("ERROR: Page '" + items[0] + "' does not exist")
                 return None
+            else:
+                return ThrowInvalidValueError(items[0])
         except:
-            InsertText("ERROR: '" + items[0] + "' is not a valid file")
-            return None
+            return ThrowInvalidValueError(items[0])
     else:
-        InsertText("ERROR: This function 'Help' takes one or no items")
-        return None
+        return ThrowParametersError("Help", 0, math.ceil(len(functionsList) / 10))
 
 def Import (items): #Imports a module from a .py file (Filename excludes the .py extension) - Takes one parameter
     if (len(items) == 1):
@@ -81,10 +94,9 @@ def Import (items): #Imports a module from a .py file (Filename excludes the .py
             InsertText("Imported functions:")
             for i in module.functions:
                 InsertText(i)
-            return items[0]
-        except:
-            InsertText("ERROR: '" + items[0] + "' is not a valid file")
             return None
+        except:
+            return ThrowInvalidValueError(items[0])
 
 def Listfiles (items): #Lists all files in the current directory - Takes no parameters
     if (not items):
@@ -96,10 +108,9 @@ def Listfiles (items): #Lists all files in the current directory - Takes no para
             pass
         for i in filelist:
             InsertText(i)
-        return filelist
-    else:
-        InsertText("ERROR: This function 'Listfiles' does not take items")
         return None
+    else:
+        return ThrowParametersError("Listfiles", 0, None)
 
 def Open (items): #Opens a .png file - Takes one parameter
     if (len(items) == 1):
@@ -111,13 +122,11 @@ def Open (items): #Opens a .png file - Takes one parameter
             labelImage.image = img
             labelImage.bind("<Configure>", ImageConfigure)
             labelImage.pack(expand = True, fill = BOTH)
-            return items[0]
-        except:
-            InsertText("ERROR: '" + items[0] + "' is not a valid file")
             return None
+        except:
+            return ThrowInvalidValueError(items[0])
     else:
-        InsertText("ERROR: The function 'Open' takes one item")
-        return None
+        return ThrowParametersError("Open", 1, None)
 
 def Read (items): #Reads a .txt file - Takes one parameter
     if (len(items) == 1):
@@ -127,13 +136,11 @@ def Read (items): #Reads a .txt file - Takes one parameter
             top.title(items[0])
             contents = Label(top, text = file.read(), justify = LEFT, anchor = NW, bg = "black", fg = "white", font = "Courier 20")
             contents.pack(fill = BOTH, expand = True)
-            return file.read()
-        except:
-            InsertText("ERROR: '" + items[0] + "' is not a valid file")
             return None
+        except:
+            return ThrowInvalidValueError(items[0])
     else:
-        InsertText("ERROR: The function 'Read' takes one item")
-        return None
+        return ThrowParametersError("Read", 1, None)
 
 functions = { #Built-in Function list 
     "Back" : Back,
@@ -174,8 +181,12 @@ def RunCommand(event):
     values = []
     functionOrder = []
     value = None
-    for i in range(len(command)): #Runs through each letter in the command
-        if (command[i] == "("): #If a bracket is found, the function is read from the bookmark and the bookmark is replaced after the bracket
+
+    #Runs through each letter in the command
+    for i in range(len(command)):
+        
+        #If a bracket is found, the function is read from the bookmark and the bookmark is replaced after the bracket
+        if (command[i] == "("):
             readValue = i + 1
             bracketlevel = bracketlevel + 1 #Bracket level is raised
             function = command[readFunction:i] #Find function
@@ -185,31 +196,38 @@ def RunCommand(event):
                 values.append(_func)
                 functionOrder.append(function)
             else:
-                InsertText("ERROR: '" + function + "' is not a valid function")
+                InsertText("FunctionError: '" + function + "' is not a valid function")
                 bracketlevel = -1
                 break
-        if (command[i] == ","): #If a comma is found, read a value from the bookmark and put it in the values in the bracketlevel
+
+        #If a comma is found, read a value from the bookmark and put it in the values in the bracketlevel
+        if (command[i] == ","):
             if (command[readValue:i] != "" and bracketlevel != -1):
                 values[bracketlevel].append(command[readValue:i])
             readValue = i + 1
             readFunction = i + 1
+        
         if (command[i] == ")"): #If a closed bracket 
             if (bracketlevel != -1):
                 if (command[readValue:i] != ""): #Includes parameters if they exist
                     values[bracketlevel].append(command[readValue:i])
                 value = None
                 value = functions[functionOrder[bracketlevel]](values[bracketlevel]) #Pass function and parameters
-                if (value == None): #If an error has occured, break
+                if (type(value) == Error): #If an error has occured, break
+                    InsertText(value.errorMessage)
                     bracketlevel = -1
                     break
+                if (bracketlevel == 0 and value != None): #Output the value if the function is at the base level
+                    InsertText(value)
                 bracketlevel = bracketlevel - 1
                 if (bracketlevel > -1): #If the brackets are closed, append the value
                     values[bracketlevel].append(str(value))
             readValue = i + 1
         elif (command[i] == " "): #Reset function bookmark if there is a space
             readFunction = i + 1
-    if (bracketlevel != -1): #Make sure brackets are closed
-        InsertText("ERROR: brackets are not closed")
+        
+    if (bracketlevel != -1): #Makes sure brackets are closed
+        InsertText("BracketsError: Brackets are not closed")
 
 def InsertText(newText): #Insert text into the console
     text.insert(0, str(newText))

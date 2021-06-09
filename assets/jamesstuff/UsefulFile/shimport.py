@@ -8,13 +8,10 @@ def Add (items): #Adds all floats passed - Takes two or more parameters
                 item = float(item)
                 result = result + item
             except:
-                __main__.InsertText("ERROR: '" + item + "' cannot be converted to a float")
-                return None
-        __main__.InsertText(str(result))
+                return __main__.ThrowInvalidValueError(item)
         return result
     else:
-        __main__.InsertText("ERROR: The function 'Add' takes at least two items")
-        return None
+        return __main__.ThrowParametersError("Add", 2, 100)
 
 def Divide (items): #Divides the first item by the next, then the product of that by the next, and so on - Takes two or more parameters
     if (len(items) >= 2):
@@ -23,13 +20,10 @@ def Divide (items): #Divides the first item by the next, then the product of tha
             try:
                 result = result / float(items[item + 1])
             except:
-                __main__.InsertText("ERROR: '" + item + "' cannot be converted to a float")
-                return None
-        __main__.InsertText(str(result))
+                return __main__.ThrowInvalidValueError(item)
         return result
     else:
-        __main__.InsertText("ERROR: The function 'Divide' takes at least two items")
-        return None
+        return __main__.ThrowParametersError("Divide", 2, 100)
 
 def Multiply (items): #Multiplies all floats passed - Takes two or more parameters
     if (len(items) >= 2):
@@ -39,13 +33,11 @@ def Multiply (items): #Multiplies all floats passed - Takes two or more paramete
                 item = float(item)
                 result = result * item
             except:
-                __main__.InsertText("ERROR: '" + item + "' cannot be converted to a float")
-                return None
-        __main__.InsertText(str(result))
+                return __main__.ThrowInvalidValueError(item)
         return result
     else:
         __main__.InsertText("ERROR: The function 'Multiply' takes at least two items")
-        return None
+        return __main__.ThrowParametersError("Multiply", 2, 100)
 
 def Subtract (items): #Subtracts the first item by the next, then the product of that by the next, and so on - Takes two or more parameters
     if (len(items) >= 2):
@@ -54,13 +46,10 @@ def Subtract (items): #Subtracts the first item by the next, then the product of
             try:
                 result = result - float(items[item + 1])
             except:
-                __main__.InsertText("ERROR: '" + item + "' cannot be converted to a float")
-                return None
-        __main__.InsertText(str(result))
+                return __main__.ThrowInvalidValueError(item)
         return result
     else:
-        __main__.InsertText("ERROR: The function 'Subtract' takes at least two items")
-        return None
+        return __main__.ThrowParametersError("Subtract", 2, 100)
 
 functions = { #Lists the functions to be read by PyConsole
     "Add" : Add,
